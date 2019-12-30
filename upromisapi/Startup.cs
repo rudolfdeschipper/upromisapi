@@ -41,6 +41,9 @@ namespace upromisapi
                     builder.WithOrigins("http://localhost:3000")
                         .AllowAnyMethod()
                         .AllowAnyHeader();
+                //    builder.WithOrigins("https://localhost:3001")
+                //        .AllowAnyMethod()
+                //        .AllowAnyHeader();
                 });
             });
         }

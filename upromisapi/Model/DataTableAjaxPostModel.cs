@@ -11,6 +11,30 @@ namespace WebApplicationReact.Models
         public int ID { get; set; }
     }
 
+    public class LoadResult<T>
+    {
+        public T[] Data { get; set; }
+        public double Pages { get; set; }
+        public string Message { get; set; }
+    }
+
+    public class SaveMessage<T>
+    {
+        public int ID { get; set; }
+        public T DataSubject { get; set; }
+        public string Action { get; set; }
+        public string SubAction { get; set; }
+        public List<object> AdditionalData { get; set; }
+    }
+
+    public class APIResult<T>
+    {
+        public int ID { get; set; }
+        public T DataSubject { get; set; }
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+
     public class DataTableAjaxPostModel
     {
         // properties are not capital due to json mapping

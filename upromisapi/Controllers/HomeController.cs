@@ -80,22 +80,22 @@ namespace upromisapi.Controllers
         public ActionResult GetContractData([FromBody] RecordGetInfo rec)
         {
             var record = Repository.Contracts.FirstOrDefault(d => d.ID == rec.ID);
-            return Ok(record);
+            return Ok(new APIResult<Contract>() { ID = record.ID, DataSubject = record, Success = true, Message = "" });
         }
 
         [HttpGet("getcontractdata/{id}")]
         public ActionResult GetContractData(int id)
         {
             var record = Repository.Contracts.FirstOrDefault(d => d.ID == id);
-            return Ok(record);
+            return Ok(new APIResult<Contract>() { ID = record.ID, DataSubject = record, Success = true, Message = "" });
         }
 
         [HttpPost("putonecontractdata")]
-        public ActionResult<OkResult> PutContractData([FromBody] Contract rec)
+        public ActionResult PutContractData([FromBody] Contract rec)
         {
             var record = Repository.Contracts.FirstOrDefault(d => d.ID == rec.ID);
 
-            return Ok();
+            return Ok(new APIResult<Contract>() { ID = record.ID, DataSubject = record, Success = true, Message = "" });
         }
 
 
@@ -104,7 +104,7 @@ namespace upromisapi.Controllers
         {
             var records = GetContractDatafromDB(Repository.Contracts, sentModel, true);
 
-            return Ok(new { data = records.Item1, pages = records.Item2 });
+            return Ok(new LoadResult<Contract>() { Data = records.Item1.ToArray(), Pages = records.Item2, Message = "" });
         }
 
         [HttpPost("getcontractdataexport")]
