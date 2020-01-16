@@ -7,6 +7,7 @@ using OfficeOpenXml;
 using System.Diagnostics;
 using System.Linq.Dynamic.Core;
 using WebApplicationReact.Models;
+using Microsoft.Extensions.Logging;
 
 namespace upromisapi.Controllers
 {
@@ -15,15 +16,16 @@ namespace upromisapi.Controllers
     public class HomeController : ControllerBase
     {
         private IContractRepository Repository;
+        private ILogger Logger;
 
-        public HomeController(IContractRepository repo)
+        public HomeController(IContractRepository repo, ILoggerProvider loggerProvider)
         {
             Repository = repo;
-
+            Logger = loggerProvider.CreateLogger("HomeController");
         }
 
         [NonAction]
-        private (IQueryable<Contract>, double) GetContractDatafromDB(IQueryable<Contract> records, DataTableAjaxPostModel sentModel, bool doPaging)
+        private (IQueryable<T>, double) GetDatafromDB<T>(IQueryable<T> records, DataTableAjaxPostModel sentModel, bool doPaging)
         {
             string whereClause = String.Empty;
             int filteredCount = records.Count();
@@ -90,19 +92,22 @@ namespace upromisapi.Controllers
             return Ok(new APIResult<Contract>() { ID = record.ID, DataSubject = record, Success = true, Message = "" });
         }
 
-        [HttpPost("putonecontractdata")]
-        public ActionResult PutContractData([FromBody] Contract rec)
+        [HttpPost("postonecontractdata")]
+        [HttpPut("postonecontractdata")]
+        [HttpDelete("postonecontractdata")]
+        public ActionResult PostContractData([FromBody] SaveMessage<Contract> rec)
         {
-            var record = Repository.Contracts.FirstOrDefault(d => d.ID == rec.ID);
-
-            return Ok(new APIResult<Contract>() { ID = record.ID, DataSubject = record, Success = true, Message = "" });
+            // var record = Repository.Contracts.FirstOrDefault(d => d.ID == rec.ID);
+            Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
+            // return posted values
+            return Ok(new APIResult<Contract>() { ID = rec.ID, DataSubject = rec.DataSubject, Success = true, Message = rec.Action + " was performed." });
         }
 
 
         [HttpPost("getcontractdata")]
         public ActionResult GetContractData([FromBody] DataTableAjaxPostModel sentModel)
         {
-            var records = GetContractDatafromDB(Repository.Contracts, sentModel, true);
+            var records = GetDatafromDB(Repository.Contracts, sentModel, true);
 
             return Ok(new LoadResult<Contract>() { Data = records.Item1.ToArray(), Pages = records.Item2, Message = "" });
         }
@@ -112,7 +117,7 @@ namespace upromisapi.Controllers
         {
             using (var package = new ExcelPackage())
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Inventory");
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Contracts");
                 //Add the headers
                 worksheet.Cells[1, 1].Value = "ID";
                 worksheet.Cells[1, 2].Value = "Code";
@@ -127,7 +132,7 @@ namespace upromisapi.Controllers
 
                 var records = Repository.Contracts;
 
-                foreach (var item in GetContractDatafromDB(records, sentModel, false).Item1)
+                foreach (var item in GetDatafromDB(records, sentModel, false).Item1)
                 {
                     worksheet.Cells[row, 1].Value = item.ID;
                     worksheet.Cells[row, 2].Value = item.Code;
@@ -148,6 +153,15 @@ namespace upromisapi.Controllers
                 //return this.File(fs, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Contract data export " + DateTime.Today.ToString("yyyyMMdd"));
             }
         }
+
+        [Route("getselectvalues")]
+        [HttpPost]
+        public ActionResult GetSelectValues([FromBody] ListValueInfo info)
+        {
+            return Ok(new ListValues() { ValueType=info.ValueType, data = new List<ListValue>() { new ListValue() { Label = "Planned", Value = "Planned" }, new ListValue() { Label = "Open", Value = "Open" }, new ListValue() { Label = "Closed" , Value = "Closed" }  } });
+        }
+
+
 
         // GET api/values
         [HttpGet]

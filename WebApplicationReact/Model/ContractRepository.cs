@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplicationReact.Models
 {
@@ -17,9 +18,15 @@ namespace WebApplicationReact.Models
         public DateTime StartDate { get; set; }
         [DisplayFormat(DataFormatString = "dd/MMM/yyyy"), JsonProperty("enddate")]
         public DateTime EndDate { get; set; }
+
+        public string Status { get; set; }
+
         public decimal Value { get; set; }
 
         public List<Contract.Payment> PaymentInfo { get; private set; } = new List<Payment>();
+
+        [NotMapped]
+        public string Modifier { get; set; } = "Unchanged";
 
         public class Payment
         {
@@ -32,6 +39,9 @@ namespace WebApplicationReact.Models
             public DateTime ActualInvoiceDate { get; set; }
             [DisplayFormat(DataFormatString ="€ #.##0,00")]
             public decimal Amount { get; set; }
+            
+            [NotMapped]
+            public string Modifier { get; set; } = "Unchanged";
         }
     }
 

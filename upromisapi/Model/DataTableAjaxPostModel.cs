@@ -11,6 +11,11 @@ namespace WebApplicationReact.Models
         public int ID { get; set; }
     }
 
+    public class ListValueInfo
+    {
+        public string ValueType { get; set; }
+    }
+
     public class LoadResult<T>
     {
         public T[] Data { get; set; }
@@ -33,6 +38,18 @@ namespace WebApplicationReact.Models
         public T DataSubject { get; set; }
         public bool Success { get; set; }
         public string Message { get; set; }
+    }
+
+    public class ListValue
+    {
+        public string Label { get; set; }
+        public object Value { get; set; }
+    }
+
+    public class ListValues
+    {
+        public string ValueType { get; set; }
+        public List<ListValue> data { get; set; }
     }
 
     public class DataTableAjaxPostModel
