@@ -13,19 +13,19 @@ namespace upromisapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class HomeController : ControllerBase
+    public class ContractController : ControllerBase
     {
-        private IContractRepository Repository;
-        private ILogger Logger;
+        private readonly IContractRepository Repository;
+        private readonly ILogger Logger;
 
-        public HomeController(IContractRepository repo, ILoggerProvider loggerProvider)
+        public ContractController(IContractRepository repo, ILoggerProvider loggerProvider)
         {
             Repository = repo;
             Logger = loggerProvider.CreateLogger("HomeController");
         }
 
         [NonAction]
-        private (IQueryable<T>, double) GetDatafromDB<T>(IQueryable<T> records, DataTableAjaxPostModel sentModel, bool doPaging)
+        private (IQueryable<T>, double) DoSortFilterAndPaging<T>(IQueryable<T> records, DataTableAjaxPostModel sentModel, bool doPaging)
         {
             string whereClause = String.Empty;
             int filteredCount = records.Count();
@@ -107,7 +107,7 @@ namespace upromisapi.Controllers
         [HttpPost("getcontractdata")]
         public ActionResult GetContractData([FromBody] DataTableAjaxPostModel sentModel)
         {
-            var records = GetDatafromDB(Repository.Contracts, sentModel, true);
+            var records = DoSortFilterAndPaging(Repository.Contracts, sentModel, true);
 
             return Ok(new LoadResult<Contract>() { Data = records.Item1.ToArray(), Pages = records.Item2, Message = "" });
         }
@@ -130,9 +130,9 @@ namespace upromisapi.Controllers
 
                 int row = 2;
 
-                var records = Repository.Contracts;
+                var records = DoSortFilterAndPaging(Repository.Contracts, sentModel, false).Item1;
 
-                foreach (var item in GetDatafromDB(records, sentModel, false).Item1)
+                foreach (var item in records)
                 {
                     worksheet.Cells[row, 1].Value = item.ID;
                     worksheet.Cells[row, 2].Value = item.Code;
@@ -146,11 +146,11 @@ namespace upromisapi.Controllers
                     worksheet.Cells[row, 7].Style.Numberformat.Format = "€ #,##0.00";
                     row++;
                 }
+
                 System.IO.MemoryStream fs = new System.IO.MemoryStream();
                 package.SaveAs(fs);
 
                 return File(fs.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                //return this.File(fs, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Contract data export " + DateTime.Today.ToString("yyyyMMdd"));
             }
         }
 
@@ -162,7 +162,6 @@ namespace upromisapi.Controllers
         }
 
 
-
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
@@ -170,29 +169,5 @@ namespace upromisapi.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

@@ -42,12 +42,12 @@ namespace WebApplicationReact.Models
 
     public class ContractRepository : IContractRepository
     {
-        private static readonly ContractRepository sharedRepository = new ContractRepository();
         private Dictionary<string, Contract> contracts = new Dictionary<string, Contract>();
 
-        public static ContractRepository SharedRepository => sharedRepository;
+        public static ContractRepository SharedRepository { get; } = new ContractRepository();
 
-        public ContractRepository() {
+        public ContractRepository()
+        {
             var initialItems = new[] {
                 new Contract { ID = 100, Title = "Contract 1", Value = 275M, StartDate=DateTime.Now, EndDate=DateTime.Now.AddYears(1), Code="Code 1", Description="Description of a really long string", Status = "Planned" },
                 new Contract { ID = 200, Title = "Contract 2", Value = -48.95M, StartDate=DateTime.Now, EndDate=DateTime.Now.AddYears(2), Code="Code 2", Description="Description of a really long string", Status = "Open" },
