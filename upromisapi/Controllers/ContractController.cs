@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
-using System.Diagnostics;
 using System.Linq.Dynamic.Core;
-using WebApplicationReact.Models;
+using upromiscontractapi.Models;
 using Microsoft.Extensions.Logging;
+using APIUtils.APIMessaging;
+using Microsoft.AspNetCore.Authorization;
 
-namespace upromisapi.Controllers
+namespace upromiscontractapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -161,6 +161,12 @@ namespace upromisapi.Controllers
             return Ok(new ListValues() { ValueType=info.ValueType, data = new List<ListValue>() { new ListValue() { Label = "Planned", Value = "Planned" }, new ListValue() { Label = "Open", Value = "Open" }, new ListValue() { Label = "Closed" , Value = "Closed" }  } });
         }
 
+        [HttpGet("getclaims/{UserID}")]
+        [Authorize()]
+        public IActionResult GetClaims(string UserID)
+        {
+            return new JsonResult(new { Key = "Contract|100", Value = "ContractAdministrator" });
+        }
 
         // GET api/values
         [HttpGet]

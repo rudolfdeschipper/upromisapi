@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
-namespace WebApplicationReact.Models
+namespace upromiscontractapi.Models
 {
     public interface IContractRepository
     {

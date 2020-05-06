@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "upromisapi", "upromisapi\upromisapi.csproj", "{061017A0-F722-4EF7-8E2F-9FA024A6A0E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "upromiscontractapi", "upromisapi\upromiscontractapi.csproj", "{061017A0-F722-4EF7-8E2F-9FA024A6A0E6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIUtils", "APIUtils\APIUtils.csproj", "{69FF977A-B6F1-49A2-BD58-8716A0152FFD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uPromis.IdentityServer", "upromis.identityserver\uPromis.IdentityServer.csproj", "{862A0560-0B75-4F1E-AC95-14531F4C12D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{061017A0-F722-4EF7-8E2F-9FA024A6A0E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{061017A0-F722-4EF7-8E2F-9FA024A6A0E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{061017A0-F722-4EF7-8E2F-9FA024A6A0E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69FF977A-B6F1-49A2-BD58-8716A0152FFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69FF977A-B6F1-49A2-BD58-8716A0152FFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69FF977A-B6F1-49A2-BD58-8716A0152FFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69FF977A-B6F1-49A2-BD58-8716A0152FFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{862A0560-0B75-4F1E-AC95-14531F4C12D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{862A0560-0B75-4F1E-AC95-14531F4C12D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{862A0560-0B75-4F1E-AC95-14531F4C12D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{862A0560-0B75-4F1E-AC95-14531F4C12D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
