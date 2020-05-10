@@ -24,9 +24,9 @@ namespace upromiscontractapi.Models
                 foreach (var p in initialItems)
                 {
                     var pItems = new[] {
-                        new Contract.Payment { ID= p.ID + 1, Description = p.Code + " payment term 1", PlannedInvoiceDate = DateTime.Now, Amount = p.Value / 3 },
-                        new Contract.Payment { ID= p.ID + 2, Description = p.Code + " payment term 2", PlannedInvoiceDate = DateTime.Now.AddMonths(1), Amount = p.Value / 3 },
-                        new Contract.Payment { ID= p.ID + 3, Description = p.Code + " payment term 3", PlannedInvoiceDate = DateTime.Now.AddMonths(2), Amount = p.Value / 3 },
+                        new ContractPaymentInfo { ID= p.ID + 1, Description = p.Code + " payment term 1", PlannedInvoiceDate = DateTime.Now, Amount = p.Value / 3 },
+                        new ContractPaymentInfo { ID= p.ID + 2, Description = p.Code + " payment term 2", PlannedInvoiceDate = DateTime.Now.AddMonths(1), Amount = p.Value / 3 },
+                        new ContractPaymentInfo { ID= p.ID + 3, Description = p.Code + " payment term 3", PlannedInvoiceDate = DateTime.Now.AddMonths(2), Amount = p.Value / 3 },
                     };
                     AddContract(1, p);
                     p.PaymentInfo.AddRange(pItems);

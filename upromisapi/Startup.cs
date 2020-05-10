@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using upromiscontractapi.Models;
@@ -22,6 +23,10 @@ namespace upromiscontractapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IContractRepository, ContractRepository>();
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddMvcOptions( o => o.EnableEndpointRouting = false); // needed to be able to access the url via browser
