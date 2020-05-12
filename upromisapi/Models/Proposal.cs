@@ -43,6 +43,9 @@ namespace upromiscontractapi.Models
         [Required, Range(0, double.MaxValue), Column(TypeName = "decimal(18, 2)"), DisplayFormat(DataFormatString = "{0:€ #.##0,00}")]
         public decimal Value { get; set; }
 
+        public int AccountInfoID { get; set; }
+        public AccountInfo AccountInfo { get; set; }
+
         // decide if we have a simple set of dates to manage the workflow of something the more sophisticated
         public List<ProposalPaymentInfo> PaymentInfo { get; private set; } = new List<ProposalPaymentInfo>();
         public List<ProposalTeamComposition> TeamComposition { get; private set; } = new List<ProposalTeamComposition>();

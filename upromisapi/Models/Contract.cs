@@ -44,6 +44,12 @@ namespace upromiscontractapi.Models
         [EnumDataType(typeof(ContractType))]
         public ContractType ContractType { get; set; }
 
+        public int AccountInfoID { get; set; }
+        public AccountInfo AccountInfo { get; set; }
+
+        public int? ParentContractID { get; set; }
+        public Contract? ParentContract { get; set; }
+
         // TODO: when sending to JSON, format it to a proper date string - the client side is not very good at this
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}"), JsonProperty("startdate")]
         public DateTime StartDate { get; set; }

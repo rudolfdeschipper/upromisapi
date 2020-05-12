@@ -8,6 +8,66 @@ namespace upromiscontractapi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "AccountInfo",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExternalID = table.Column<Guid>(nullable: false),
+                    Name = table.Column<string>(maxLength: 100, nullable: false),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    CreatedBy = table.Column<string>(nullable: true),
+                    UpdatedOn = table.Column<DateTime>(nullable: false),
+                    UpdatedBy = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountInfo", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AccountField",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountInfoID = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(maxLength: 50, nullable: false),
+                    Value = table.Column<string>(maxLength: 100, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountField", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_AccountField_AccountInfo_AccountInfoID",
+                        column: x => x.AccountInfoID,
+                        principalTable: "AccountInfo",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AccountTeamComposition",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountInfoID = table.Column<int>(nullable: false),
+                    TeamMember = table.Column<Guid>(nullable: false),
+                    MemberType = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountTeamComposition", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_AccountTeamComposition_AccountInfo_AccountInfoID",
+                        column: x => x.AccountInfoID,
+                        principalTable: "AccountInfo",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Contracts",
                 columns: table => new
                 {
@@ -23,6 +83,8 @@ namespace upromiscontractapi.Migrations
                     UpdatedOn = table.Column<DateTime>(nullable: false),
                     UpdatedBy = table.Column<string>(nullable: true),
                     ContractType = table.Column<int>(nullable: false),
+                    AccountInfoID = table.Column<int>(nullable: false),
+                    ParentContractID = table.Column<int>(nullable: true),
                     StartDate = table.Column<DateTime>(nullable: false),
                     EndDate = table.Column<DateTime>(nullable: false),
                     Value = table.Column<decimal>(type: "decimal(18, 2)", nullable: false)
@@ -30,6 +92,18 @@ namespace upromiscontractapi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Contracts", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Contracts_AccountInfo_AccountInfoID",
+                        column: x => x.AccountInfoID,
+                        principalTable: "AccountInfo",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Contracts_Contracts_ParentContractID",
+                        column: x => x.ParentContractID,
+                        principalTable: "Contracts",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,11 +123,18 @@ namespace upromiscontractapi.Migrations
                     UpdatedBy = table.Column<string>(nullable: true),
                     ContractType = table.Column<int>(nullable: false),
                     RequestType = table.Column<int>(nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(18, 2)", nullable: false)
+                    Value = table.Column<decimal>(type: "decimal(18, 2)", nullable: false),
+                    AccountInfoID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Proposals", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Proposals_AccountInfo_AccountInfoID",
+                        column: x => x.AccountInfoID,
+                        principalTable: "AccountInfo",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -72,11 +153,18 @@ namespace upromiscontractapi.Migrations
                     UpdatedOn = table.Column<DateTime>(nullable: false),
                     UpdatedBy = table.Column<string>(nullable: true),
                     ContractType = table.Column<int>(nullable: false),
-                    RequestType = table.Column<int>(nullable: false)
+                    RequestType = table.Column<int>(nullable: false),
+                    AccountInfoID = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Requests", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Requests_AccountInfo_AccountInfoID",
+                        column: x => x.AccountInfoID,
+                        principalTable: "AccountInfo",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -192,9 +280,29 @@ namespace upromiscontractapi.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AccountField_AccountInfoID",
+                table: "AccountField",
+                column: "AccountInfoID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccountTeamComposition_AccountInfoID",
+                table: "AccountTeamComposition",
+                column: "AccountInfoID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ContractPaymentInfo_ContractID",
                 table: "ContractPaymentInfo",
                 column: "ContractID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contracts_AccountInfoID",
+                table: "Contracts",
+                column: "AccountInfoID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contracts_ParentContractID",
+                table: "Contracts",
+                column: "ParentContractID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ContractTeamComposition_ContractID",
@@ -207,9 +315,19 @@ namespace upromiscontractapi.Migrations
                 column: "ProposalID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Proposals_AccountInfoID",
+                table: "Proposals",
+                column: "AccountInfoID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProposalTeamComposition_ProposalID",
                 table: "ProposalTeamComposition",
                 column: "ProposalID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Requests_AccountInfoID",
+                table: "Requests",
+                column: "AccountInfoID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RequestTeamComposition_RequestID",
@@ -219,6 +337,12 @@ namespace upromiscontractapi.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AccountField");
+
+            migrationBuilder.DropTable(
+                name: "AccountTeamComposition");
+
             migrationBuilder.DropTable(
                 name: "ContractPaymentInfo");
 
@@ -242,6 +366,9 @@ namespace upromiscontractapi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Requests");
+
+            migrationBuilder.DropTable(
+                name: "AccountInfo");
         }
     }
 }

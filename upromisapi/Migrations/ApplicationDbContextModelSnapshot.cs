@@ -19,12 +19,96 @@ namespace upromiscontractapi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("upromiscontractapi.Models.AccountField", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AccountInfoID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("AccountInfoID");
+
+                    b.ToTable("AccountField");
+                });
+
+            modelBuilder.Entity("upromiscontractapi.Models.AccountInfo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ExternalID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("AccountInfo");
+                });
+
+            modelBuilder.Entity("upromiscontractapi.Models.AccountTeamComposition", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AccountInfoID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MemberType")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TeamMember")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("AccountInfoID");
+
+                    b.ToTable("AccountTeamComposition");
+                });
+
             modelBuilder.Entity("upromiscontractapi.Models.Contract", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AccountInfoID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -49,6 +133,9 @@ namespace upromiscontractapi.Migrations
                     b.Property<Guid>("ExternalID")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("ParentContractID")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -72,6 +159,10 @@ namespace upromiscontractapi.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("AccountInfoID");
+
+                    b.HasIndex("ParentContractID");
 
                     b.ToTable("Contracts");
                 });
@@ -149,6 +240,9 @@ namespace upromiscontractapi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("AccountInfoID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)")
@@ -192,6 +286,8 @@ namespace upromiscontractapi.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("AccountInfoID");
 
                     b.ToTable("Proposals");
                 });
@@ -254,6 +350,9 @@ namespace upromiscontractapi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("AccountInfoID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)")
@@ -295,6 +394,8 @@ namespace upromiscontractapi.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("AccountInfoID");
+
                     b.ToTable("Requests");
                 });
 
@@ -321,6 +422,37 @@ namespace upromiscontractapi.Migrations
                     b.ToTable("RequestTeamComposition");
                 });
 
+            modelBuilder.Entity("upromiscontractapi.Models.AccountField", b =>
+                {
+                    b.HasOne("upromiscontractapi.Models.AccountInfo", "AccountInfo")
+                        .WithMany("AccountFields")
+                        .HasForeignKey("AccountInfoID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("upromiscontractapi.Models.AccountTeamComposition", b =>
+                {
+                    b.HasOne("upromiscontractapi.Models.AccountInfo", "AccountInfo")
+                        .WithMany("TeamComposition")
+                        .HasForeignKey("AccountInfoID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("upromiscontractapi.Models.Contract", b =>
+                {
+                    b.HasOne("upromiscontractapi.Models.AccountInfo", "AccountInfo")
+                        .WithMany("Contracts")
+                        .HasForeignKey("AccountInfoID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("upromiscontractapi.Models.Contract", "ParentContract")
+                        .WithMany()
+                        .HasForeignKey("ParentContractID");
+                });
+
             modelBuilder.Entity("upromiscontractapi.Models.ContractPaymentInfo", b =>
                 {
                     b.HasOne("upromiscontractapi.Models.Contract", "Contract")
@@ -339,6 +471,15 @@ namespace upromiscontractapi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("upromiscontractapi.Models.Proposal", b =>
+                {
+                    b.HasOne("upromiscontractapi.Models.AccountInfo", "AccountInfo")
+                        .WithMany("Proposals")
+                        .HasForeignKey("AccountInfoID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("upromiscontractapi.Models.ProposalPaymentInfo", b =>
                 {
                     b.HasOne("upromiscontractapi.Models.Proposal", "Proposal")
@@ -353,6 +494,15 @@ namespace upromiscontractapi.Migrations
                     b.HasOne("upromiscontractapi.Models.Proposal", "Proposal")
                         .WithMany("TeamComposition")
                         .HasForeignKey("ProposalID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("upromiscontractapi.Models.Request", b =>
+                {
+                    b.HasOne("upromiscontractapi.Models.AccountInfo", "AccountInfo")
+                        .WithMany("Requests")
+                        .HasForeignKey("AccountInfoID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
