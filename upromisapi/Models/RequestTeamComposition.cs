@@ -8,13 +8,13 @@ using Newtonsoft.Json;
 namespace upromiscontractapi.Models
 {
 
-    public class ProposalTeamComposition
+    public class RequestTeamComposition
     {
         [Key]
         public int ID { get; set; }
 
-        public int ProposalID { get; set; }
-        public Proposal Proposal { get; set; }
+        public int RequestID { get; set; }
+        public Request Request { get; set; }
 
         [Required]
         public Guid TeamMember { get; set; }

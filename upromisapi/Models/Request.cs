@@ -45,6 +45,10 @@ namespace upromiscontractapi.Models
         [EnumDataType(typeof(RequestType))]
         public RequestType RequestType { get; set; }
 
+        public int AccountInfoID { get; set; }
+        public AccountInfo AccountInfo { get; set; }
+        public List<RequestTeamComposition> TeamComposition { get; private set; } = new List<RequestTeamComposition>();
+
         // decide if we have a simple set of dates to manage the workflow of something the more sophisticated
 
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace upromiscontractapi.Models
@@ -23,12 +24,12 @@ namespace upromiscontractapi.Models
         [Required, StringLength(maximumLength: 20, MinimumLength = 1, ErrorMessage = "Status cannot be empty, but no longer than 20 characters")]
         public string Status { get; set; }
 
-        [DisplayFormat(DataFormatString = "dd/MMM/yyyy"), JsonProperty("createdon")]
+        [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}"), JsonProperty("createdon")]
         public DateTime CreatedOn { get; set; }
 
         public string CreatedBy { get; set; }
 
-        [DisplayFormat(DataFormatString = "dd/MMM/yyyy"), JsonProperty("updatedon")]
+        [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}"), JsonProperty("updatedon")]
         public DateTime UpdatedOn { get; set; }
 
         public string UpdatedBy { get; set; }
@@ -39,8 +40,14 @@ namespace upromiscontractapi.Models
         [EnumDataType(typeof(RequestType))]
         public RequestType RequestType { get; set; }
 
+        [Required, Range(0, double.MaxValue), Column(TypeName = "decimal(18, 2)"), DisplayFormat(DataFormatString = "{0:€ #.##0,00}")]
+        public decimal Value { get; set; }
+
+        public int AccountInfoID { get; set; }
+        public AccountInfo AccountInfo { get; set; }
+
         // decide if we have a simple set of dates to manage the workflow of something the more sophisticated
-        public List<ContractPaymentInfo> PaymentInfo { get; private set; } = new List<ContractPaymentInfo>();
+        public List<ProposalPaymentInfo> PaymentInfo { get; private set; } = new List<ProposalPaymentInfo>();
         public List<ProposalTeamComposition> TeamComposition { get; private set; } = new List<ProposalTeamComposition>();
     }
 }
