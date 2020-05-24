@@ -13,18 +13,18 @@ namespace upromiscontractapi.Models
         [Key]
         public int ID { get; set; }
 
-        public Guid ExternalID { get; set; }
+        public Guid ExternalID { get; set; } = Guid.NewGuid();
 
         [Required, StringLength(100)]
         public string Name { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
 
         public string CreatedBy { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime UpdatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
 
         public string UpdatedBy { get; set; }
 

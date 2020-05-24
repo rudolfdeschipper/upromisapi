@@ -13,7 +13,7 @@ namespace upromiscontractapi.Models
         [Key]
         public int ID { get; set; }
 
-        public Guid ExternalID { get; set; }
+        public Guid ExternalID { get; set; } = Guid.NewGuid();
 
         [Required, StringLength(maximumLength: 20, MinimumLength = 1, ErrorMessage = "Code cannot be empty, but no longer than 20 characters")]
         public string Code { get; set; }
@@ -26,12 +26,12 @@ namespace upromiscontractapi.Models
         public string Status { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
 
         public string CreatedBy { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime UpdatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
 
         public string UpdatedBy { get; set; }
 
