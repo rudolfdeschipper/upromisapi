@@ -13,7 +13,10 @@ namespace upromiscontractapi.Models
             to.ContractType = from.ContractType;
             to.Description = from.Description;
             to.EndDate = from.EndDate;
-            to.ExternalID = from.ExternalID;
+            // no need to copy this one: if it is an add, the to has a value,
+            // if it is an update, don't change it
+            //to.ExternalID = from.ExternalID;
+            // TODO
             //to.ParentContract = from.ParentContract;
             //to.ParentContractID = from.ParentContractID;
             to.StartDate = from.StartDate;
