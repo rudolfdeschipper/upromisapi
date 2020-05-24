@@ -10,7 +10,7 @@ namespace upromiscontractapi.Models
         [Key]
         public int ID { get; set; }
 
-        public Guid ExternalID { get; set; }
+        public Guid ExternalID { get; set; } = Guid.NewGuid();
 
         [Required, StringLength(100)]
         public string Name { get; set; }

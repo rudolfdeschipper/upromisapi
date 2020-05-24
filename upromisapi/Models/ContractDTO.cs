@@ -12,7 +12,7 @@ namespace upromiscontractapi.Models
         [Key]
         public int ID { get; set; }
 
-        public Guid ExternalID { get; set; }
+        public Guid ExternalID { get; set; } = Guid.NewGuid();
 
         [Required, StringLength(maximumLength: 20, MinimumLength = 1, ErrorMessage = "Code cannot be empty, but no longer than 20 characters")]
         public string Code { get; set; }
