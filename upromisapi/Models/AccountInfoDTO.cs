@@ -2,13 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace upromiscontractapi.Models
 {
-
-    public class AccountInfo 
+    public class AccountInfoDTO : DTOBase
     {
         [Key]
         public int ID { get; set; }
@@ -32,8 +29,9 @@ namespace upromiscontractapi.Models
         public virtual List<Proposal> Proposals { get; private set; } = new List<Proposal>();
         public virtual List<Request> Requests { get; private set; } = new List<Request>();
 
-        public List<AccountTeamComposition> TeamComposition { get; set; } = new List<AccountTeamComposition>();
-        public List<AccountField> AccountFields { get; set; } = new List<AccountField>();
+        public List<AccountTeamCompositionDTO> TeamComposition { get; private set; } = new List<AccountTeamCompositionDTO>();
+        public List<AccountFieldDTO> AccountFields { get; private set; } = new List<AccountFieldDTO>();
+
     }
 
 }

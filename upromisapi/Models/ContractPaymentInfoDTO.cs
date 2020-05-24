@@ -5,20 +5,13 @@ using Newtonsoft.Json;
 
 namespace upromiscontractapi.Models
 {
-    public enum ContractPaymentStatus
-    { 
-        Planned,
-        Invoiced,
-        Paid
-    }
-
-    public class ContractPaymentInfo
+    public class ContractPaymentInfoDTO : DTOBase
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
         public int ID { get; set; }
 
-        public int ContractID { get; set; }
-        public Contract Contract { get; set; }
+        public int ContractID { get; set; } = 0;
+        public ContractDTO Contract { get; set; }
 
         [Required]
         public string Description { get; set; }
@@ -29,7 +22,7 @@ namespace upromiscontractapi.Models
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
         public DateTime ActualInvoiceDate { get; set; }
 
-        [Required, Range(0,double.MaxValue), DisplayFormat(DataFormatString ="{0:€ #.##0,00}"), Column(TypeName = "decimal(18, 2)")]
+        [Required, Range(0, double.MaxValue), DisplayFormat(DataFormatString = "{0:€ #.##0,00}"), Column(TypeName = "decimal(18, 2)")]
         public decimal Amount { get; set; }
 
         [EnumDataType(typeof(ContractPaymentStatus))]
@@ -37,5 +30,6 @@ namespace upromiscontractapi.Models
 
         [StringLength(100)]
         public string Comment { get; set; }
+
     }
 }

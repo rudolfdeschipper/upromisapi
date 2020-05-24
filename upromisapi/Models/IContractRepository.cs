@@ -1,11 +1,23 @@
-﻿using System.Linq;
+﻿using APIUtils.APIMessaging;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace upromiscontractapi.Models
 {
-    public interface IContractRepository
+    public interface IRepository<T>
     {
-        IQueryable<Contract> Contracts { get; }
+        IQueryable<T> List { get; }
 
-        void AddContract(int i, Contract p);
+        Task<APIResult<T>> Get(int id);
+
+        Task<APIResult<T>> Post(SaveMessage<T> rec);
+        Task<APIResult<T>> Put(SaveMessage<T> rec);
+        Task<APIResult<T>> Delete(SaveMessage<T> rec);
+
+    }
+
+
+    public interface IContractRepository : IRepository<ContractDTO>
+    {
     }
 }

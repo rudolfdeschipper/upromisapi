@@ -11,9 +11,9 @@ namespace upromiscontractapi.Models
         ExtensionRequest
     }
 
-    public partial class Request
+    public class Request 
     {
-     
+
         [Key]
         public int ID { get; set; }
 
@@ -29,12 +29,12 @@ namespace upromiscontractapi.Models
         [Required, StringLength(maximumLength: 20, MinimumLength = 1, ErrorMessage = "Status cannot be empty, but no longer than 20 characters")]
         public string Status { get; set; }
 
-        [DisplayFormat(DataFormatString = "dd/MMM/yyyy"), JsonProperty("createdon")]
+        [DisplayFormat(DataFormatString = "dd/MMM/yyyy")]
         public DateTime CreatedOn { get; set; }
 
         public string CreatedBy { get; set; }
 
-        [DisplayFormat(DataFormatString = "dd/MMM/yyyy"), JsonProperty("updatedon")]
+        [DisplayFormat(DataFormatString = "dd/MMM/yyyy")]
         public DateTime UpdatedOn { get; set; }
 
         public string UpdatedBy { get; set; }
@@ -47,7 +47,7 @@ namespace upromiscontractapi.Models
 
         public int AccountInfoID { get; set; }
         public AccountInfo AccountInfo { get; set; }
-        public List<RequestTeamComposition> TeamComposition { get; private set; } = new List<RequestTeamComposition>();
+        public List<RequestTeamComposition> TeamComposition { get; set; } = new List<RequestTeamComposition>();
 
         // decide if we have a simple set of dates to manage the workflow of something the more sophisticated
 

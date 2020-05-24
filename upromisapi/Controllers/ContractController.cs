@@ -8,9 +8,12 @@ using upromiscontractapi.Models;
 using Microsoft.Extensions.Logging;
 using APIUtils.APIMessaging;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace upromiscontractapi.Controllers
 {
+    // TODO: add authorisation
+
     [Route("api/[controller]")]
     [ApiController]
     public class ContractController : ControllerBase
@@ -77,43 +80,85 @@ namespace upromiscontractapi.Controllers
             return (records, sentModel?.pageSize != 0 ? Math.Ceiling((double)(filteredCount / sentModel.pageSize)) : 1.0);
         }
 
-        [Route("getonecontractdata")]
-        [HttpPost, HttpOptions]
-        public ActionResult GetContractData([FromBody] RecordGetInfo rec)
+        [HttpGet("{id}")]
+        public async Task<ActionResult> Get(int id)
         {
-            var record = Repository.Contracts.FirstOrDefault(d => d.ID == rec.ID);
-            return Ok(new APIResult<Contract>() { ID = record.ID, DataSubject = record, Success = true, Message = "" });
+            var res = await Repository.Get(id);
+            return Ok(res);
         }
 
-        [HttpGet("getcontractdata/{id}")]
-        public ActionResult GetContractData(int id)
+        [HttpPost()]
+        public async Task<ActionResult> Post([FromBody] SaveMessage<ContractDTO> rec)
         {
-            var record = Repository.Contracts.FirstOrDefault(d => d.ID == id);
-            return Ok(new APIResult<Contract>() { ID = record.ID, DataSubject = record, Success = true, Message = "" });
-        }
+            APIResult<ContractDTO> res;
 
-        [HttpPost("postonecontractdata")]
-        [HttpPut("postonecontractdata")]
-        [HttpDelete("postonecontractdata")]
-        public ActionResult PostContractData([FromBody] SaveMessage<Contract> rec)
-        {
-            // var record = Repository.Contracts.FirstOrDefault(d => d.ID == rec.ID);
             Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
+
+            try
+            {
+                res = await Repository.Post(rec);
+            }
+            catch (Exception ex)
+            {
+                return this.Problem(ex.Message, GetType().Name, 500, "Error");
+            }
+
             // return posted values
-            return Ok(new APIResult<Contract>() { ID = rec.ID, DataSubject = rec.DataSubject, Success = true, Message = rec.Action + " was performed." });
+            return Ok(res);
         }
 
+        [HttpPut()]
+        public async Task<ActionResult> Put([FromBody] SaveMessage<ContractDTO> rec)
+        {   
+            APIResult<ContractDTO> res;
 
-        [HttpPost("getcontractdata")]
-        public ActionResult GetContractData([FromBody] DataTableAjaxPostModel sentModel)
+            Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
+
+            try
+            {
+                res = await Repository.Put(rec);
+            }
+            catch (Exception ex)
+            {
+                return this.Problem(ex.Message, GetType().Name, 500, "Error");
+            }
+
+            // return posted values
+            return Ok(res);
+        }
+
+        [HttpDelete()]
+        public async Task<ActionResult> Delete([FromBody] SaveMessage<ContractDTO> rec)
         {
-            var records = DoSortFilterAndPaging(Repository.Contracts, sentModel, true);
+            APIResult<ContractDTO> res;
 
-            return Ok(new LoadResult<Contract>() { Data = records.Item1.ToArray(), Pages = records.Item2, Message = "" });
+            Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
+
+            try
+            {
+                res = await Repository.Delete(rec);
+            }
+            catch (Exception ex)
+            {
+                return this.Problem(ex.Message, GetType().Name, 500, "Error");
+            }
+
+            // return posted values
+            return Ok(res);
         }
 
-        [HttpPost("getcontractdataexport")]
-        public IActionResult GetContractDataExport([FromBody] DataTableAjaxPostModel sentModel)
+        // TODO: transform into a get with a body (this is possible)
+        [HttpPost("getlist")]
+        public ActionResult GetList([FromBody] DataTableAjaxPostModel sentModel)
+        {
+            var records = DoSortFilterAndPaging(Repository.List, sentModel, true);
+
+            return Ok(new LoadResult<ContractDTO>() { Data = records.Item1.ToArray(), Pages = records.Item2, Message = "" });
+        }
+
+        // TODO: this can be a normal "get", with a filter on the header " 'Content-Type': 'application/excel' or something
+        [HttpPost("getforexport")]
+        public IActionResult GetForExport([FromBody] DataTableAjaxPostModel sentModel)
         {
             using (var package = new ExcelPackage())
             {
@@ -130,7 +175,7 @@ namespace upromiscontractapi.Controllers
 
                 int row = 2;
 
-                var records = DoSortFilterAndPaging(Repository.Contracts, sentModel, false).Item1;
+                var records = DoSortFilterAndPaging(Repository.List, sentModel, false).Item1;
 
                 foreach (var item in records)
                 {
@@ -154,25 +199,48 @@ namespace upromiscontractapi.Controllers
             }
         }
 
+        // TODO: make into a get with a body
         [Route("getselectvalues")]
         [HttpPost]
         public ActionResult GetSelectValues([FromBody] ListValueInfo info)
         {
-            return Ok(new ListValues() { ValueType=info.ValueType, data = new List<ListValue>() { new ListValue() { Label = "Planned", Value = "Planned" }, new ListValue() { Label = "Open", Value = "Open" }, new ListValue() { Label = "Closed" , Value = "Closed" }  } });
+            List<ListValue> list = new List<ListValue>();
+            Type t = null;
+
+            switch (info.ValueType)
+            {
+                case "ContractType":
+                    t = typeof(ContractType);
+                    break;
+                case "PaymentStatus":
+                    t = typeof(ContractPaymentStatus);
+                    break;
+                case "RequestType":
+                    t = typeof(RequestType);
+                    break;
+                case "ContractStatus":
+                    list =  new List<ListValue>() { new ListValue() { Label = "Planned", Value = "Planned" }, new ListValue() { Label = "Open", Value = "Open" }, new ListValue() { Label = "Closed", Value = "Closed" } };
+                    break;
+                default:
+                    break;
+            }
+            if (t != null)
+            {
+                foreach (var item in Enum.GetValues(t))
+                {
+                    list.Add(new ListValue() { Label = Enum.GetName(t, item), Value = item });
+                }
+            }
+
+            return Ok(new ListValues() { ValueType = info.ValueType, data = list });
         }
 
         [HttpGet("getclaims/{UserID}")]
         [Authorize()]
         public IActionResult GetClaims(string UserID)
         {
-            return new JsonResult(new { Key = "Contract|100", Value = "ContractAdministrator" });
-        }
-
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
-        {
-            return new string[] { "value1", "value2" };
+            var claims = Repository.List.Where(c => c.TeamComposition.Any(t => t.TeamMember.ToString().Equals(UserID))).Select(c => new { Key = "Contract|" + c.ID, Value = c.TeamComposition.First(t => t.TeamMember.ToString().Equals(UserID)).MemberType.ToString() });
+            return new JsonResult(claims);
         }
 
     }

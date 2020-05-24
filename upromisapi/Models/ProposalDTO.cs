@@ -6,17 +6,10 @@ using Newtonsoft.Json;
 
 namespace upromiscontractapi.Models
 {
-    public enum ContractType
-    { 
-        TimeAndMeans,
-        QuotedTimeAndMeans,
-        FixedPrice
-    }
-
-    public class Contract 
+    public class ProposalDTO : DTOBase
     {
-     
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+        [Key]
         public int ID { get; set; }
 
         public Guid ExternalID { get; set; }
@@ -44,22 +37,17 @@ namespace upromiscontractapi.Models
         [EnumDataType(typeof(ContractType))]
         public ContractType ContractType { get; set; }
 
-        public int AccountInfoID { get; set; }
-        public AccountInfo AccountInfo { get; set; }
+        [EnumDataType(typeof(RequestType))]
+        public RequestType RequestType { get; set; }
 
-        public int? ParentContractID { get; set; }
-        public Contract ParentContract { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime StartDate { get; set; }
-        [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
-        public DateTime EndDate { get; set; }
-
-        [Required, Range(0,double.MaxValue), Column(TypeName = "decimal(18, 2)"), DisplayFormat(DataFormatString = "{0:€ #.##0,00}")]
+        [Required, Range(0, double.MaxValue), Column(TypeName = "decimal(18, 2)"), DisplayFormat(DataFormatString = "{0:€ #.##0,00}")]
         public decimal Value { get; set; }
 
-        public List<ContractPaymentInfo> PaymentInfo { get; set; } = new List<ContractPaymentInfo>();
-        public List<ContractTeamComposition> TeamComposition { get; set; } = new List<ContractTeamComposition>();
-    }
+        public int AccountInfoID { get; set; }
+        public AccountInfoDTO AccountInfo { get; set; }
 
+        // decide if we have a simple set of dates to manage the workflow of something the more sophisticated
+        public List<ProposalPaymentInfoDTO> PaymentInfo { get; private set; } = new List<ProposalPaymentInfoDTO>();
+        public List<ProposalTeamCompositionDTO> TeamComposition { get; private set; } = new List<ProposalTeamCompositionDTO>();
+    }
 }

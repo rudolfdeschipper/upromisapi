@@ -6,17 +6,10 @@ using Newtonsoft.Json;
 
 namespace upromiscontractapi.Models
 {
-    public enum ContractType
-    { 
-        TimeAndMeans,
-        QuotedTimeAndMeans,
-        FixedPrice
-    }
-
-    public class Contract 
+    public class ContractDTO : DTOBase
     {
-     
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+        [Key]
         public int ID { get; set; }
 
         public Guid ExternalID { get; set; }
@@ -45,21 +38,21 @@ namespace upromiscontractapi.Models
         public ContractType ContractType { get; set; }
 
         public int AccountInfoID { get; set; }
-        public AccountInfo AccountInfo { get; set; }
+        public AccountInfoDTO AccountInfo { get; set; }
 
         public int? ParentContractID { get; set; }
-        public Contract ParentContract { get; set; }
+        public ContractDTO ParentContract { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
         public DateTime StartDate { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd/MMM/yyyy}")]
         public DateTime EndDate { get; set; }
 
-        [Required, Range(0,double.MaxValue), Column(TypeName = "decimal(18, 2)"), DisplayFormat(DataFormatString = "{0:€ #.##0,00}")]
+        [Required, Range(0, double.MaxValue), Column(TypeName = "decimal(18, 2)"), DisplayFormat(DataFormatString = "{0:€ #.##0,00}")]
         public decimal Value { get; set; }
 
-        public List<ContractPaymentInfo> PaymentInfo { get; set; } = new List<ContractPaymentInfo>();
-        public List<ContractTeamComposition> TeamComposition { get; set; } = new List<ContractTeamComposition>();
+        public List<ContractPaymentInfoDTO> PaymentInfo { get; set; } = new List<ContractPaymentInfoDTO>();
+        public List<ContractTeamCompositionDTO> TeamComposition { get; set; } = new List<ContractTeamCompositionDTO>();
     }
 
 }

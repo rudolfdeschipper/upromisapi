@@ -1,41 +1,84 @@
-﻿using System;
+﻿using APIUtils.APIMessaging;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace upromiscontractapi.Models
 {
 
     public class ContractRepository : IContractRepository
     {
-        private Dictionary<string, Contract> contracts = new Dictionary<string, Contract>();
+        ApplicationDbContext _context { get; set; }
 
-        public static ContractRepository SharedRepository { get; } = new ContractRepository();
-
-        public ContractRepository()
+        public ContractRepository(ApplicationDbContext context)
         {
-            var initialItems = new[] {
-                new Contract { ID = 100, Title = "Contract 1", Value = 275M, StartDate=DateTime.Now, EndDate=DateTime.Now.AddYears(1), Code="Code 1", Description="Description of a really long string", Status = "Planned" },
-                new Contract { ID = 200, Title = "Contract 2", Value = -48.95M, StartDate=DateTime.Now, EndDate=DateTime.Now.AddYears(2), Code="Code 2", Description="Description of a really long string", Status = "Open" },
-                new Contract { ID = 300, Title = "Contract 3", Value = 19.50M, StartDate=DateTime.Now, EndDate=DateTime.Now.AddYears(3), Code="Code 3", Description="Description of a really long string", Status = "Open" },
-                new Contract { ID = 400, Title = "Contract 4", Value = 34.95M, StartDate=DateTime.Now, EndDate=DateTime.Now.AddMonths(10), Code="Code 4", Description="Description of a really long string", Status = "Closed" } };
-            
-            //for (int i = 0; i < 100; i++)
-            {
-                foreach (var p in initialItems)
-                {
-                    var pItems = new[] {
-                        new ContractPaymentInfo { ID= p.ID + 1, Description = p.Code + " payment term 1", PlannedInvoiceDate = DateTime.Now, Amount = p.Value / 3 },
-                        new ContractPaymentInfo { ID= p.ID + 2, Description = p.Code + " payment term 2", PlannedInvoiceDate = DateTime.Now.AddMonths(1), Amount = p.Value / 3 },
-                        new ContractPaymentInfo { ID= p.ID + 3, Description = p.Code + " payment term 3", PlannedInvoiceDate = DateTime.Now.AddMonths(2), Amount = p.Value / 3 },
-                    };
-                    AddContract(1, p);
-                    p.PaymentInfo.AddRange(pItems);
-                }
-            }
+            _context = context;
+
         }
-        public IQueryable<Contract> Contracts => contracts.Values.AsQueryable();
+        public IQueryable<ContractDTO> List => _context.Contracts.Select(c => Transformers.Transform(c, new ContractDTO() { Modifier = "Unchanged"} ) ).AsQueryable();
 
-        public void AddContract(int i, Contract p) => contracts.Add(p.ID.ToString(), p);
+        public async Task<APIResult<ContractDTO>> Post(SaveMessage<ContractDTO> rec )
+        {
+            // TODO: add validations
+            // TODO: check for new users to create in the team composition list
 
+            Contract contract = Transformers.Transform(rec.DataSubject, new Contract()) as Contract;
+            
+            contract.PaymentInfo.ForEach(pi => { pi.Contract = contract;
+            });
+
+            contract.TeamComposition.ForEach(pi => {
+                pi.Contract = contract;
+            });
+
+            contract.AccountInfo = _context.AccountInfo.FirstOrDefault();
+
+            contract.ParentContract = _context.Contracts.Find(rec.DataSubject.ParentContractID);
+
+            _context.Contracts.Add(contract);
+            
+            await _context.SaveChangesAsync();
+
+            return new APIResult<ContractDTO>() { ID = rec.DataSubject.ID, Success = true, DataSubject = Transformers.Transform(contract, new ContractDTO()), Message = "Post was performed" };
+        }
+
+        public async Task<APIResult<ContractDTO>> Put(SaveMessage<ContractDTO> rec )
+        {
+            var ctr = await _context.Contracts.Where(c => c.ID == rec.ID)
+                .Include("PaymentInfo")
+                .Include("TeamComposition")
+                .FirstOrDefaultAsync();
+
+            ctr = Transformers.Transform(rec.DataSubject, ctr);
+
+            await _context.SaveChangesAsync();
+
+            return new APIResult<ContractDTO>() { ID = ctr.ID, DataSubject=Transformers.Transform(ctr, new ContractDTO()), Success = true, Message = "Put was performed" };
+        }
+
+        public async Task<APIResult<ContractDTO>> Delete(SaveMessage<ContractDTO> rec )
+        {
+            var ctr = _context.Contracts.FirstOrDefault(c => c.ID == rec.ID);
+
+            _context.Contracts.Remove(ctr);
+
+            await _context.SaveChangesAsync();
+
+            return new APIResult<ContractDTO>() { ID = rec.ID, Success = true, DataSubject = null, Message = "Delete was performed" };
+        }
+
+        public async Task<APIResult<ContractDTO>> Get(int id)
+        {
+            var contract = await _context.Contracts.Where(c => c.ID == id)
+                .Include("PaymentInfo")
+                .Include("TeamComposition")
+                .FirstOrDefaultAsync();
+
+            var ctr = Transformers.Transform(contract, new ContractDTO() { Modifier = "Unchanged" });
+
+            return new APIResult<ContractDTO>() { ID = id, Success = true, DataSubject = ctr, Message = "Get was performed" };
+        }
     }
 }

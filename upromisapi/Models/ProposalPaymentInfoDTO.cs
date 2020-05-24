@@ -5,14 +5,13 @@ using Newtonsoft.Json;
 
 namespace upromiscontractapi.Models
 {
-
-    public class ProposalPaymentInfo
+    public class ProposalPaymentInfoDTO : DTOBase
     {
         [Key]
         public int ID { get; set; }
 
         public int ProposalID { get; set; }
-        public Proposal Proposal { get; set; }
+        public ProposalDTO Proposal { get; set; }
 
         [Required]
         public string Description { get; set; }
