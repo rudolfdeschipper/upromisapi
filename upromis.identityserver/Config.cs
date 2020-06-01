@@ -21,7 +21,8 @@ namespace IdentityServerAspNetIdentity
             new ApiResource[]
             {
                 // add the additional claims you want to receive over this API here:
-                new ApiResource("api1", "My API") {  UserClaims = { "lastproject"} }
+                new ApiResource("api1", "My API") {  UserClaims = { "lastproject"} },
+                new ApiResource("api2", "Attachment API") {}
             };
 
         public static IEnumerable<Client> Clients =>
@@ -42,7 +43,7 @@ namespace IdentityServerAspNetIdentity
                     },
 
                     // scopes that client has access to
-                    AllowedScopes = { "api1" }
+                    AllowedScopes = { "api1", "api2" }
                 },
                 new Client
                 {
@@ -84,7 +85,8 @@ namespace IdentityServerAspNetIdentity
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
-                        "api1"
+                        "api1",
+                        "api2"
                     }
                 },
                 // SPA client, the real one
@@ -105,6 +107,7 @@ namespace IdentityServerAspNetIdentity
                     {
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
+                        "api2",
                         "api1"
                     }
                 }
