@@ -37,22 +37,24 @@ namespace upromiscontractapi.Controllers
             {
                 // filtering
                 // column search is handled here:0
-                foreach (var item in sentModel.filtered)
+                if (sentModel.filtered != null)
                 {
-                    if (!String.IsNullOrEmpty(item.value))
+                    foreach (var item in sentModel.filtered)
                     {
-                        whereClause = whereClause + item.id + ".ToString().Contains(\"" + item.value + "\") &&";
+                        if (!String.IsNullOrEmpty(item.value))
+                        {
+                            whereClause = whereClause + item.id + ".ToString().Contains(\"" + item.value + "\") &&";
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(whereClause))
+                    {
+                        whereClause = whereClause.Substring(0, whereClause.Length - 2);
+                        records = records.Where(whereClause);
+                        filteredCount = records.Count();
                     }
                 }
-                if (!string.IsNullOrEmpty(whereClause))
-                {
-                    whereClause = whereClause.Substring(0, whereClause.Length - 2);
-                    records = records.Where(whereClause);
-                    filteredCount = records.Count();
-                }
-
                 // ordering
-                if (sentModel.sorted.Any())
+                if (sentModel.sorted != null)
                 {
                     string orderBy = "";
                     foreach (var o in sentModel.sorted)
