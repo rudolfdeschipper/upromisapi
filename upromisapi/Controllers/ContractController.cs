@@ -112,7 +112,7 @@ namespace upromiscontractapi.Controllers
 
         [HttpPut()]
         public async Task<ActionResult> Put([FromBody] SaveMessage<ContractDTO> rec)
-        {   
+        {
             APIResult<ContractDTO> res;
 
             Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
@@ -222,7 +222,7 @@ namespace upromiscontractapi.Controllers
                     t = typeof(RequestType);
                     break;
                 case "ContractStatus":
-                    list =  new List<ListValue>() { new ListValue() { Label = "Planned", Value = "Planned" }, new ListValue() { Label = "Open", Value = "Open" }, new ListValue() { Label = "Closed", Value = "Closed" } };
+                    list = new List<ListValue>() { new ListValue() { Label = "Planned", Value = "Planned" }, new ListValue() { Label = "Open", Value = "Open" }, new ListValue() { Label = "Closed", Value = "Closed" } };
                     break;
                 default:
                     break;
@@ -242,7 +242,13 @@ namespace upromiscontractapi.Controllers
         [Authorize()]
         public IActionResult GetClaims(string UserID)
         {
-            var claims = Repository.List.Where(c => c.TeamComposition.Any(t => t.TeamMember.ToString().Equals(UserID))).Select(c => new { Key = "Contract|" + c.ID, Value = c.TeamComposition.First(t => t.TeamMember.ToString().Equals(UserID)).MemberType.ToString() });
+            var claims = Repository.List
+                .Where(c => c.TeamComposition.Any(t => t.TeamMember.ToString().Equals(UserID)))
+                .Select(c => new { 
+                    Key = "Contract|" + c.ID, 
+                    Value = c.TeamComposition
+                        .First(t => t.TeamMember.ToString().Equals(UserID)).MemberType.ToString() 
+                });
             return new JsonResult(claims);
         }
 
