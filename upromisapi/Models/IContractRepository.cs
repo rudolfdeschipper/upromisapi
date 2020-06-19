@@ -8,11 +8,11 @@ namespace upromiscontractapi.Models
     {
         IQueryable<T> List { get; }
 
-        Task<APIResult<T>> Get(int id);
+        Task<T> Get(int id);
 
-        Task<APIResult<T>> Post(SaveMessage<T> rec);
-        Task<APIResult<T>> Put(SaveMessage<T> rec);
-        Task<APIResult<T>> Delete(SaveMessage<T> rec);
+        Task<T> Post(SaveMessage<T> rec);
+        Task<T> Put(SaveMessage<T> rec);
+        Task<bool> Delete(SaveMessage<T> rec);
 
     }
 

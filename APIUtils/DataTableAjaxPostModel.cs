@@ -36,7 +36,6 @@ namespace APIUtils.APIMessaging
     {
         public int ID { get; set; }
         public T DataSubject { get; set; }
-        public bool Success { get; set; }
         public string Message { get; set; }
     }
 

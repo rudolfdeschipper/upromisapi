@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using APIUtils.APIMessaging;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace upromiscontractapi.Controllers
 {
@@ -87,13 +88,19 @@ namespace upromiscontractapi.Controllers
         public async Task<ActionResult> Get(int id)
         {
             var res = await Repository.Get(id);
-            return Ok(res);
+
+            if (res == null)
+            {
+                return NotFound(new APIResult<ContractDTO>() { ID = id, DataSubject = null, Message = "Get failed" });
+            }
+
+            return Ok(new APIResult<ContractDTO>() { ID = id, DataSubject = res, Message = "Get was performed" });
         }
 
         [HttpPost()]
         public async Task<ActionResult> Post([FromBody] SaveMessage<ContractDTO> rec)
         {
-            APIResult<ContractDTO> res;
+            ContractDTO res;
 
             Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
 
@@ -107,19 +114,23 @@ namespace upromiscontractapi.Controllers
             }
 
             // return posted values
-            return Ok(res);
+            return Ok(new APIResult<ContractDTO>() { ID = res.ID, DataSubject = res, Message = "Put was performed" });
         }
 
         [HttpPut()]
         public async Task<ActionResult> Put([FromBody] SaveMessage<ContractDTO> rec)
         {
-            APIResult<ContractDTO> res;
+            ContractDTO res;
 
             Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
 
             try
             {
                 res = await Repository.Put(rec);
+                if (res == null)
+                {
+                    return NotFound(new APIResult<ContractDTO>() { ID = rec.ID, DataSubject = null, Message = "Put failed - record is not found" });
+                }
             }
             catch (Exception ex)
             {
@@ -127,41 +138,45 @@ namespace upromiscontractapi.Controllers
             }
 
             // return posted values
-            return Ok(res);
+            return Ok(new APIResult<ContractDTO>() { ID = res.ID, DataSubject = res, Message = "Put was performed" });
         }
 
         [HttpDelete()]
         public async Task<ActionResult> Delete([FromBody] SaveMessage<ContractDTO> rec)
         {
-            APIResult<ContractDTO> res;
+            bool res;
 
             Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
 
             try
             {
                 res = await Repository.Delete(rec);
+                if (res == false)
+                {
+                    return NotFound(new APIResult<ContractDTO>() { ID = rec.ID, DataSubject = null, Message = "Delete failed - record not found" });
+                }
             }
             catch (Exception ex)
             {
                 return this.Problem(ex.Message, GetType().Name, 500, "Error");
             }
 
-            // return posted values
-            return Ok(res);
+            // return 
+            return Ok(new APIResult<ContractDTO>() { ID = rec.ID, DataSubject = null, Message = "Delete was performed" });
         }
 
         // TODO: transform into a get with a body (this is possible)
         [HttpPost("getlist")]
-        public ActionResult GetList([FromBody] DataTableAjaxPostModel sentModel)
+        public async Task<ActionResult> GetList([FromBody] DataTableAjaxPostModel sentModel)
         {
             var records = DoSortFilterAndPaging(Repository.List, sentModel, true);
 
-            return Ok(new LoadResult<ContractDTO>() { Data = records.Item1.ToArray(), Pages = records.Item2, Message = "" });
+            return Ok(new LoadResult<ContractDTO>() { Data = await records.Item1.ToArrayAsync(), Pages = records.Item2, Message = "" });
         }
 
         // TODO: this can be a normal "get", with a filter on the header " 'Content-Type': 'application/excel' or something
         [HttpPost("getforexport")]
-        public IActionResult GetForExport([FromBody] DataTableAjaxPostModel sentModel)
+        public async Task<IActionResult> GetForExport([FromBody] DataTableAjaxPostModel sentModel)
         {
             using (var package = new ExcelPackage())
             {
@@ -196,7 +211,7 @@ namespace upromiscontractapi.Controllers
                 }
 
                 System.IO.MemoryStream fs = new System.IO.MemoryStream();
-                package.SaveAs(fs);
+                await package.SaveAsAsync(fs);
 
                 return File(fs.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             }
@@ -205,7 +220,7 @@ namespace upromiscontractapi.Controllers
         // TODO: make into a get with a body
         [Route("getselectvalues")]
         [HttpPost]
-        public ActionResult GetSelectValues([FromBody] ListValueInfo info)
+        public async Task<ActionResult> GetSelectValues([FromBody] ListValueInfo info)
         {
             List<ListValue> list = new List<ListValue>();
             Type t = null;
@@ -240,7 +255,7 @@ namespace upromiscontractapi.Controllers
 
         [HttpGet("getclaims/{UserID}")]
         [Authorize()]
-        public IActionResult GetClaims(string UserID)
+        public async Task<IActionResult> GetClaims(string UserID)
         {
             var claims = Repository.List
                 .Where(c => c.TeamComposition.Any(t => t.TeamMember.ToString().Equals(UserID)))
@@ -249,7 +264,7 @@ namespace upromiscontractapi.Controllers
                     Value = c.TeamComposition
                         .First(t => t.TeamMember.ToString().Equals(UserID)).MemberType.ToString() 
                 });
-            return new JsonResult(claims);
+            return new JsonResult(await claims.ToArrayAsync());
         }
 
     }
