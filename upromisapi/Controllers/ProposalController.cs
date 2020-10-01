@@ -22,15 +22,15 @@ namespace upromiscontractapi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class ContractController : ControllerBase
+    public class ProposalController : ControllerBase
     {
-        private readonly IContractRepository Repository;
+        private readonly IProposalRepository Repository;
         private readonly ILogger Logger;
 
-        public ContractController(IContractRepository repo, ILoggerProvider loggerProvider)
+        public ProposalController(IProposalRepository repo, ILoggerProvider loggerProvider)
         {
             Repository = repo;
-            Logger = loggerProvider.CreateLogger("ContractController");
+            Logger = loggerProvider.CreateLogger("ProposalController");
         }
 
         [NonAction]
@@ -95,16 +95,16 @@ namespace upromiscontractapi.Controllers
 
             if (res == null)
             {
-                return NotFound(new APIResult<ContractDTO>() { ID = id, DataSubject = null, Message = "Get failed" });
+                return NotFound(new APIResult<ProposalDTO>() { ID = id, DataSubject = null, Message = "Get failed" });
             }
 
-            return Ok(new APIResult<ContractDTO>() { ID = id, DataSubject = res, Message = "Get was performed" });
+            return Ok(new APIResult<ProposalDTO>() { ID = id, DataSubject = res, Message = "Get was performed" });
         }
 
         [HttpPost()]
-        public async Task<ActionResult> Post([FromBody] SaveMessage<ContractDTO> rec)
+        public async Task<ActionResult> Post([FromBody] SaveMessage<ProposalDTO> rec)
         {
-            ContractDTO res;
+            ProposalDTO res;
 
             Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
 
@@ -118,13 +118,13 @@ namespace upromiscontractapi.Controllers
             }
 
             // return posted values
-            return Ok(new APIResult<ContractDTO>() { ID = res.ID, DataSubject = res, Message = "Put was performed" });
+            return Ok(new APIResult<ProposalDTO>() { ID = res.ID, DataSubject = res, Message = "Put was performed" });
         }
 
         [HttpPut()]
-        public async Task<ActionResult> Put([FromBody] SaveMessage<ContractDTO> rec)
+        public async Task<ActionResult> Put([FromBody] SaveMessage<ProposalDTO> rec)
         {
-            ContractDTO res;
+            ProposalDTO res;
 
             Logger.Log(LogLevel.Information, rec.Action + "/" + rec.SubAction);
 
@@ -133,7 +133,7 @@ namespace upromiscontractapi.Controllers
                 res = await Repository.Put(rec);
                 if (res == null)
                 {
-                    return NotFound(new APIResult<ContractDTO>() { ID = rec.ID, DataSubject = null, Message = "Put failed - record is not found" });
+                    return NotFound(new APIResult<ProposalDTO>() { ID = rec.ID, DataSubject = null, Message = "Put failed - record is not found" });
                 }
             }
             catch (Exception ex)
@@ -142,11 +142,11 @@ namespace upromiscontractapi.Controllers
             }
 
             // return posted values
-            return Ok(new APIResult<ContractDTO>() { ID = res.ID, DataSubject = res, Message = "Put was performed" });
+            return Ok(new APIResult<ProposalDTO>() { ID = res.ID, DataSubject = res, Message = "Put was performed" });
         }
 
         [HttpDelete()]
-        public async Task<ActionResult> Delete([FromBody] SaveMessage<ContractDTO> rec)
+        public async Task<ActionResult> Delete([FromBody] SaveMessage<ProposalDTO> rec)
         {
             bool res;
 
@@ -157,7 +157,7 @@ namespace upromiscontractapi.Controllers
                 res = await Repository.Delete(rec);
                 if (res == false)
                 {
-                    return NotFound(new APIResult<ContractDTO>() { ID = rec.ID, DataSubject = null, Message = "Delete failed - record not found" });
+                    return NotFound(new APIResult<ProposalDTO>() { ID = rec.ID, DataSubject = null, Message = "Delete failed - record not found" });
                 }
             }
             catch (Exception ex)
@@ -166,7 +166,7 @@ namespace upromiscontractapi.Controllers
             }
 
             // return 
-            return Ok(new APIResult<ContractDTO>() { ID = rec.ID, DataSubject = null, Message = "Delete was performed" });
+            return Ok(new APIResult<ProposalDTO>() { ID = rec.ID, DataSubject = null, Message = "Delete was performed" });
         }
 
         // TODO: transform into a get with a body (this is possible)
@@ -175,7 +175,7 @@ namespace upromiscontractapi.Controllers
         {
             var records = DoSortFilterAndPaging(Repository.List, sentModel, true);
 
-            return Ok(new LoadResult<ContractDTO>() { Data = await records.Item1.ToArrayAsync(), Pages = records.Item2, Message = "" });
+            return Ok(new LoadResult<ProposalDTO>() { Data = await records.Item1.ToArrayAsync(), Pages = records.Item2, Message = "" });
         }
 
         // TODO: this can be a normal "get", with a filter on the header " 'Content-Type': 'application/excel' or something
@@ -184,26 +184,22 @@ namespace upromiscontractapi.Controllers
         {
             using (var package = new ExcelPackage())
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Contract List");
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Proposal List");
                 //Add the headers
                 int col = 0;
                 int row = 1;
                 col++;
                 worksheet.Cells[row, col].Value = "Unique ID";
                 col++;
+                worksheet.Cells[row, col].Value = "External ID";
+                col++;
                 worksheet.Cells[row, col].Value = "Code";
                 col++;
                 worksheet.Cells[row, col].Value = "Description";
                 col++;
-                worksheet.Cells[row, col].Value = "Status";
-                col++;
                 worksheet.Cells[row, col].Value = "Startdate";
                 col++;
                 worksheet.Cells[row, col].Value = "Enddate";
-                col++;
-                worksheet.Cells[row, col].Value = "Budget";
-                col++;
-                worksheet.Cells[row, col].Value = "Contract type";
                 worksheet.Cells[1, 1, 1, col].Style.Font.Bold = true;
 
                 var records = DoSortFilterAndPaging(Repository.List, sentModel, false).Item1;
@@ -214,21 +210,17 @@ namespace upromiscontractapi.Controllers
                     col = 1;
                     worksheet.Cells[row, col].Value = item.ID;
                     col++;
+                    worksheet.Cells[row, col].Value = item.ExternalID;
+                    col++;
                     worksheet.Cells[row, col].Value = item.Code;
                     col++;
                     worksheet.Cells[row, col].Value = item.Description;
-                    col++;
-                    worksheet.Cells[row, col].Value = item.Status;
                     col++;
                     worksheet.Cells[row, col].Value = item.Startdate;
                     worksheet.Cells[row, col].Style.Numberformat.Format = "MM/DD/YYYY";
                     col++;
                     worksheet.Cells[row, col].Value = item.Enddate;
                     worksheet.Cells[row, col].Style.Numberformat.Format = "MM/DD/YYYY";
-                    col++;
-                    worksheet.Cells[row, col].Value = item.Budget;
-                    col++;
-                    worksheet.Cells[row, col].Value = item.ContractType;
                     col++;
                 }
 
@@ -249,12 +241,6 @@ namespace upromiscontractapi.Controllers
 
             switch (info.ValueType)
             {
-                case "Status":
-                    t = typeof(Status);
-                    break;
-                case "ContractType":
-                    t = typeof(ContractType);
-                    break;
                 default:
                     break;
             }
@@ -276,9 +262,9 @@ namespace upromiscontractapi.Controllers
             var claims = Repository.List
                 .Where(c => c.Teammembers.Any(t => t.TeamMember.ToString().Equals(UserID)))
                 .Select(c => new { 
-                    Key = "Contract|" + c.ID, 
+                    Key = "Proposal|" + c.ID, 
                     Value = c.Teammembers
-                        .First(t => t.TeamMember.ToString().Equals(UserID)).ContractMemberType.ToString() 
+                        .First(t => t.TeamMember.ToString().Equals(UserID)).ProposalMemberType.ToString() 
                 });
             return new JsonResult(await claims.ToArrayAsync());
         }
