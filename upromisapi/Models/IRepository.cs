@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace upromiscontractapi.Models
 {
-    public interface IRepository<T>
+    public interface IRepository<T, TList>
     {
-        IQueryable<T> List { get; }
+        IQueryable<TList> List { get; }
 
         Task<T> Get(int id);
 

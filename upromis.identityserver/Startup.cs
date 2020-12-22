@@ -56,6 +56,10 @@ namespace IdentityServerAspNetIdentity
                     options.Events.RaiseInformationEvents = true;
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
+
+                    // needed to support older versions of browsers
+                    // https://github.com/IdentityServer/IdentityServer4/issues/475
+                    options.Csp.Level = IdentityServer4.Models.CspLevel.One;
                 })
                 .AddInMemoryIdentityResources(Config.Ids)
                 .AddInMemoryApiResources(Config.Apis)

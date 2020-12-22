@@ -32,13 +32,14 @@ namespace IdentityServerAspNetIdentity.Models
         public virtual async Task GetProfileDataAsync(IdentityServer4.Models.ProfileDataRequestContext context)
         {
 
-        context.IssuedClaims.AddRange(context.Subject.Claims);
+            context.IssuedClaims.AddRange(context.Subject.Claims);
 
             var client = new HttpClient();
             var disco = await client.GetDiscoveryDocumentAsync("http://localhost:5000");
             if (disco.IsError)
             {
                 await Task.FromException(disco.Exception);
+                Console.WriteLine(disco.Error);
                 return;
             }
 
@@ -55,6 +56,7 @@ namespace IdentityServerAspNetIdentity.Models
             if (tokenResponse.IsError)
             {
                 await Task.FromException(tokenResponse.Exception);
+                Console.WriteLine(tokenResponse.ErrorDescription);
                 return;
             }
 
