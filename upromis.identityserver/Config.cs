@@ -36,6 +36,8 @@ namespace IdentityServerAspNetIdentity
                     // no interactive user, use the clientid/secret for authentication
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
 
+                    UserSsoLifetime = null,
+
                     // secret for authentication
                     ClientSecrets =
                     {
@@ -54,6 +56,8 @@ namespace IdentityServerAspNetIdentity
                     AllowedGrantTypes = GrantTypes.Code,
                     RequireConsent = false,
                     RequirePkce = true,
+
+                    UserSsoLifetime = null,
 
                     // where to redirect to after login
                     RedirectUris = { "http://localhost:5002/signin-oidc" },
@@ -77,6 +81,8 @@ namespace IdentityServerAspNetIdentity
                     RequireClientSecret = false,
                     RequireConsent = false,
 
+                    UserSsoLifetime = null,
+
                     RedirectUris =           { "http://localhost:5003/callback.html" },
                     PostLogoutRedirectUris = { "http://localhost:5003/index.html" },
                     AllowedCorsOrigins =     { "http://localhost:5003" },
@@ -98,7 +104,7 @@ namespace IdentityServerAspNetIdentity
                     RequirePkce = true,
                     RequireClientSecret = false,
                     RequireConsent = false,
-
+                    UserSsoLifetime = null,
                     RedirectUris =           { "http://localhost:3000/callback.html" },
                     PostLogoutRedirectUris = { "http://localhost:3000/home" },
                     AllowedCorsOrigins =     { "http://localhost:3000" },
