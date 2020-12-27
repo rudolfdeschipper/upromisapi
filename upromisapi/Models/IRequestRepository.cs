@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 
 namespace upromiscontractapi.Models
 {
-    public interface IContractRepository : IRepository<ContractDTO, Contract>
+    public interface IRequestRepository : IRepository<RequestDTO, Request>
     {
-        public Task<List<ListValue>> GetProposalIdReference();
 
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using upromiscontractapi.Models;
+using Newtonsoft.Json;
 
 namespace upromiscontractapi
 {
@@ -23,13 +24,18 @@ namespace upromiscontractapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IContractRepository, ContractRepository>();
+            services.AddTransient<IRequestRepository, RequestRepository>();
+            services.AddTransient<IProposalRepository, ProposalRepository>();
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ContractDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddMvcOptions( o => o.EnableEndpointRouting = false); // needed to be able to access the url via browser
+                .AddMvcOptions(o => o.EnableEndpointRouting = false) // needed to be able to access the url via browser
+                .AddNewtonsoftJson()
+                ;
+            
 
             // added logging
             services.AddLogging();

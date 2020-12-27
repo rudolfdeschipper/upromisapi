@@ -109,6 +109,8 @@ namespace IdentityServerAspNetIdentity
                     PostLogoutRedirectUris = { "http://localhost:3000/home" },
                     AllowedCorsOrigins =     { "http://localhost:3000" },
 
+                    UserSsoLifetime = null,
+
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,

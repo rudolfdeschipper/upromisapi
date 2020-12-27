@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\ApplicationDbContext.cs" />
     <Compile Remove="Migrations\20200511190455_InitialCreate.cs" />
     <Compile Remove="Migrations\20200511190455_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\20200511191356_InitialCreate.cs" />
@@ -21,10 +22,18 @@
     <Compile Remove="Migrations\20200511200708_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\20200512194046_InitialCreate.cs" />
     <Compile Remove="Migrations\20200512194046_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20200512194936_InitialCreate.cs" />
+    <Compile Remove="Migrations\20200512194936_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20201213204431_Add Proposal to Contract.cs" />
+    <Compile Remove="Migrations\20201213204431_Add Proposal to Contract.Designer.cs" />
+    <Compile Remove="Migrations\20201216210011_Add Proposal reference to Contract.cs" />
+    <Compile Remove="Migrations\20201216210011_Add Proposal reference to Contract.Designer.cs" />
+    <Compile Remove="Migrations\ApplicationDbContextModelSnapshot.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="5.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
