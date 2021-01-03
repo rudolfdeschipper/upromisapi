@@ -23,9 +23,13 @@ namespace upromiscontractapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IContractRepository, ContractRepository>();
             services.AddTransient<IRequestRepository, RequestRepository>();
             services.AddTransient<IProposalRepository, ProposalRepository>();
+            services.AddTransient<IContractRepository, ContractRepository>();
+
+            services.AddTransient<Business.IRequestBusinessRules, Business.RequestBusinessRules>();
+            services.AddTransient<Business.IProposalBusinessRules, Business.ProposalBusinessRules>();
+            services.AddTransient<Business.IContractBusinessRules, Business.ContractBusinessRules>();
 
             services.AddDbContext<ContractDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
