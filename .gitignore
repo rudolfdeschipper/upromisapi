@@ -260,3 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 /upromisattachmentapi/00000000-0000-0000-0000-000000000000
+
+#zerocode generated files
+**/generated/*
