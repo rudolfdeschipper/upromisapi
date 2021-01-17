@@ -14,7 +14,7 @@ namespace upromis.Services
         Task Post(Service.BusinessLogging.DTO.LogEntry log);
     }
 
-    public class BusinessLoggingService
+    public class BusinessLoggingService : IBusinessLoggingService
     {
         public BusinessLoggingService()
         {

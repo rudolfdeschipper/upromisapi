@@ -49,6 +49,7 @@
     <ProjectReference Include="..\APIUtils\APIUtils.csproj">
       <Private>true</Private>
     </ProjectReference>
+    <ProjectReference Include="..\upromis.Services\upromis.Services.csproj" />
   </ItemGroup>
 
 </Project>
