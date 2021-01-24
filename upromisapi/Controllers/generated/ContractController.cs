@@ -74,7 +74,7 @@ namespace upromiscontractapi.Controllers
                 record = await Repository.Post(record);
                 res = Transformers.Transform(record, new ContractDTO());
 
-                Uri uri = new Uri("rabbitmq://localhost/ReportServerContractQueue");
+                Uri uri = new Uri("rabbitmq://localhost/ReportServerContractCreateQueue");
                 var endPoint = await ReportServerBus.GetSendEndpoint(uri);
                 await endPoint.Send<upromis.Services.DTO.ContractReportEntry>(new upromis.Services.DTO.ContractReportEntry() { 
                     ID = record.ID,
@@ -128,6 +128,22 @@ namespace upromiscontractapi.Controllers
 
                 res = Transformers.Transform(record, new ContractDTO());
 
+                Uri uri = new Uri("rabbitmq://localhost/ReportServerContractUpdateQueue");
+                var endPoint = await ReportServerBus.GetSendEndpoint(uri);
+                await endPoint.Send<upromis.Services.DTO.ContractReportEntry>(new upromis.Services.DTO.ContractReportEntry()
+                {
+                    ID = record.ID,
+                    Code = record.Code,
+                    Title = record.Title,
+                    Description = record.Description,
+                    Startdate = record.Startdate,
+                    Enddate = record.Enddate,
+                    Status = record.ContractStatus,
+                    Budget = (decimal)record.Budget,
+                    Proposal = res.ProposalIdLabel
+                });
+
+
             }
             catch (Exception ex)
             {
@@ -155,6 +171,22 @@ namespace upromiscontractapi.Controllers
                 {
                     return NotFound(new APIResult<ContractDTO>() { ID = rec.ID, DataSubject = null, Message = "Delete failed - record not found" });
                 }
+                Uri uri = new Uri("rabbitmq://localhost/ReportServerContractDeleteQueue");
+                var endPoint = await ReportServerBus.GetSendEndpoint(uri);
+                await endPoint.Send<upromis.Services.DTO.ContractReportEntry>(new upromis.Services.DTO.ContractReportEntry()
+                {
+                    ID = record.ID,
+                    Code = record.Code,
+                    Title = record.Title,
+                    Description = record.Description,
+                    Startdate = record.Startdate,
+                    Enddate = record.Enddate,
+                    Status = record.ContractStatus,
+                    Budget = (decimal)record.Budget,
+                    Proposal = rec.DataSubject.ProposalIdLabel
+                });
+
+
             }
             catch (Exception ex)
             {

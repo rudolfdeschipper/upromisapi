@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using upromiscontractapi.Models;
 using Newtonsoft.Json;
 using Microsoft.IdentityModel.Tokens;
+using MassTransit;
 
 namespace upromiscontractapi
 {
@@ -112,6 +113,7 @@ namespace upromiscontractapi
 
             app.UseCors(MyAllowSpecificOrigins);
 
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
