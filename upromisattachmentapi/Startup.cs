@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using LiteX.Storage.Core;
 using LiteX.Storage.FileSystem;
+using Microsoft.IdentityModel.Tokens;
 
 namespace upromisattachmentapi
 {
@@ -50,8 +51,19 @@ namespace upromisattachmentapi
                     options.Authority = "http://localhost:5000";
                     options.RequireHttpsMetadata = false;
 
-                    options.Audience = "api2";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false
+                    };
                 });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiScope", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("scope", "api2");
+                });
+            });
             services.AddCors(options =>
             {
                 options.AddPolicy(MyAllowSpecificOrigins,
@@ -83,12 +95,14 @@ namespace upromisattachmentapi
 
             app.UseCors(MyAllowSpecificOrigins);
 
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
-            //app.UseHttpsRedirection();
-            // needed to access url
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers()
+                    .RequireAuthorization("ApiScope");
+            });
         }
     }
 }

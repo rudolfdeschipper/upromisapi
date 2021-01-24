@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using upromiscontractapi.Models;
 using Newtonsoft.Json;
+using Microsoft.IdentityModel.Tokens;
 
 namespace upromiscontractapi
 {
@@ -52,8 +53,19 @@ namespace upromiscontractapi
                     options.Authority = "http://localhost:5000";
                     options.RequireHttpsMetadata = false;
 
-                    options.Audience = "api1";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false
+                    };
                 });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiScope", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("scope", "api1");
+                });
+            });
             services.AddCors(options =>
             {
                 options.AddPolicy(MyAllowSpecificOrigins,
@@ -85,12 +97,14 @@ namespace upromiscontractapi
 
             app.UseCors(MyAllowSpecificOrigins);
 
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
-            //app.UseHttpsRedirection();
-            // needed to access url
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers()
+                    .RequireAuthorization("ApiScope");
+            });
         }
     }
 }
