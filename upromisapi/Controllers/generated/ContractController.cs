@@ -17,6 +17,7 @@ using APIUtils.APIMessaging;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
 
 namespace upromiscontractapi.Controllers
 {
@@ -28,13 +29,14 @@ namespace upromiscontractapi.Controllers
         private readonly IContractRepository Repository;
         private readonly ILogger Logger;
         private readonly Business.IContractBusinessRules BusinessRules;
-
+        private readonly IBus ReportServerBus;
         public ContractController(IContractRepository repo, ILoggerProvider loggerProvider,
-            Business.IContractBusinessRules businessRules)
+            Business.IContractBusinessRules businessRules, IBus reportServerBus)
         {
             Repository = repo;
             Logger = loggerProvider.CreateLogger("ContractController");
             BusinessRules = businessRules;
+            ReportServerBus = reportServerBus;
         }
 
         [HttpGet("{id}")]
@@ -71,6 +73,22 @@ namespace upromiscontractapi.Controllers
                 }
                 record = await Repository.Post(record);
                 res = Transformers.Transform(record, new ContractDTO());
+
+                Uri uri = new Uri("rabbitmq://localhost/ReportServerContractQueue");
+                var endPoint = await ReportServerBus.GetSendEndpoint(uri);
+                await endPoint.Send<upromis.Services.DTO.ContractReportEntry>(new upromis.Services.DTO.ContractReportEntry() { 
+                    ID = record.ID,
+                    Code = record.Code,
+                    Title = record.Title,
+                    Description = record.Description,
+                    Startdate = record.Startdate,
+                    Enddate = record.Enddate,
+                    Status = record.ContractStatus,
+                    Budget = (decimal)record.Budget,
+                    Proposal = res.ProposalIdLabel                    
+                });
+
+
             }
             catch (Exception ex)
             {

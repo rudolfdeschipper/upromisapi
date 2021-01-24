@@ -20,7 +20,7 @@ namespace uPromis.Microservice.Identityserver
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
             {
-                new ApiScope("api1", "My API") {  UserClaims = { "lastproject"} },
+                new ApiScope("api1", "My API"), // {  UserClaims = { "lastproject"} },
                 new ApiScope("api2", "Attachment API") {}
             };
 

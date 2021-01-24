@@ -18,7 +18,7 @@ namespace upromis.Services
     {
         public BusinessLoggingService()
         {
-            Service = RestService.For<IBusinessLogging>("https://localhost:44376");
+            Service = RestService.For<IBusinessLogging>("https://localhost:5051");
         }
 
         public IBusinessLogging Service { get; set; }
